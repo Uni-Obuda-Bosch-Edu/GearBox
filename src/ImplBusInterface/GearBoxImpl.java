@@ -14,26 +14,24 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	@Override
 	public void setGearTorque(int gearTorque) {
-			shiftDrive();
-			// / lehet kikene szerveyni egy fuggvenybe es meghivni itt es a
-		// setGearrevolutionba is
-
-		// setWheelTorque(calcOutputTorque())
-		// setWheelRevolution(calcOutputRevolution())
+		shiftDrive();
+		container.setWheelTorqueInNewton((double) calcOutputTorque(gearTorque));
 	}
 
 	@Override
 	public void setGearRevolution(int gearRevolution) {
+		shiftDrive();
+		// kerék fordulatszam ?!
 		// int gearRevoljution not used
-
+		// setWheelRevolution(calcOutputRevolution())
 		// setWheelTorque(calcOutputTorque())
 		// setWheelRevolution(calcOutputRevolution())
 	}
 
 	@Override
 	public void setGearMode(int gearMode) {
-
-		if (true) {// if(fek pedal contaner.getpedal... valami) akkor lehet ez
+		// 0° beonyomott pedal vagy a max angle ?!
+		if (container.getBrakePedalAngle() >= 0.0 && container.getBrakePedalAngle() <= 4.0) {
 
 			if (isShiftLeverPositionD(container.getShiftLeverPosition())) {
 				ShiftLeverPositionD();
@@ -45,9 +43,8 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 				ShiftLeverPositionR();
 			}
 
-		} else {
-			setGearTorque((int) container.getGearTorque());
 		}
+		// if(fek  pedal contaner.getpedal.. valami) akkor lehet ez
 	}
 
 	private boolean isShiftLeverPositionD(int ShiftLeverPosition) {
@@ -68,7 +65,7 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	private void ShiftLeverPositionD() {
 		setGearTorque((int) container.getGearTorque());// interfaceben double
-														// tipusra at kell irni
+		// tipusra at kell irni
 		setGearRevolution(container.getGearRevolution());
 	}
 
@@ -77,13 +74,13 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 		setGearRevolution(0);
 	}
 
-	private void ShiftLeverPositionP() { // / P and N kozott mi a kulonbseg
+	private void ShiftLeverPositionP() {
 		setGearTorque(0);
 		setGearRevolution(0);
 	}
 
 	private void ShiftLeverPositionR() {
-		setGearRevolution(-1);
+		setGearTorque(-1);
 	}
 
 	private void shiftDrive() {
@@ -112,30 +109,9 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	}
 
 	private double calcOutputRevolution() {
-		double wheel = 1.831861129; // inkabb container.getWheel valamit
-									// hasznalj
-		return ((container.getCurrentGear() / 3.6) * 60.0 * gearRatios[gearStatus]) / wheel;
+		// kerekatmorovel a kerke korrigalja
+		return ((container.getCurrentGear() / 3.6) * 60.0 * gearRatios[gearStatus]);
 	}
-
-	/*
-	 * 
-	 * public int shift(String shiftPosition){ int st = 0;
-	 * if(isShiftLeverPositionP(getShiftLeverPosition()) ||
-	 * isShiftLeverPositionR(getShiftLeverPosition())){
-	 * ShiftLeverPositionPorR(); } else
-	 * if(isShiftLeverPositionR(getShiftLeverPosition())){
-	 * 
-	 * st = shiftReverse(); System.out.println( "Reverse function"); } else
-	 * if(isShiftLeverPositionD(getShiftLeverPosition())){
-	 * 
-	 * st = shiftDrive(); System.out.println( "Drive function"); }else{ st = -1;
-	 * //@TODO: -ESHIFT -: valtohiba enumba }
-	 * 
-	 * return st; }
-	 * 
-	 * 
-	 * private double wheel = 1.831861129; //[m]
-	 */
 
 	public GearBoxImpl() {
 		container = Container.getInstance();
