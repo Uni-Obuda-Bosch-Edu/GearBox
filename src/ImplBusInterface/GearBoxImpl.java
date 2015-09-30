@@ -108,13 +108,13 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	}
 
 	private double calcOutputTorque(int gearTorque) {
-		return gearTorque * gearRatios[container.getGearMode()];
+		return gearTorque * gearRatios[gearStatus];
 	}
 
 	private double calcOutputRevolution() {
 		double wheel = 1.831861129; // inkabb container.getWheel valamit
 									// hasznalj
-		return ((container.getCurrentGear() / 3.6) * 60.0 * gearRatios[container.getGearMode()]) / wheel;
+		return ((container.getCurrentGear() / 3.6) * 60.0 * gearRatios[gearStatus]) / wheel;
 	}
 
 	/*
