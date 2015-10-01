@@ -12,10 +12,17 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return instance;
 	}
 
-	public double getSteeringWheelAngle() {
+	public boolean getEngineToggleButtonState() {
+		return EngineToggleButtonState;
+	}
+
+	public void setEngineToggleButtonState(boolean buttonState) {
+		EngineToggleButtonState = buttonState;		
+	}
+	public double getSteeringWheelSignedPercentage() {
 		return SteeringWheelAngle;
 	}
-	public void setSteeringWheelAngle(int steeringWheelAngle) {
+	public void setWheelRotationPercent(double steeringWheelAngle) {
 		SteeringWheelAngle = steeringWheelAngle;
 	}
 	
@@ -23,39 +30,23 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return SteeringWheelMaxAngle;
 	}
 
-	public void setSteeringWheelMaxAngle(int steeringWheelMaxAngle) {
+	public void setSteeringWheelMaxAngle(double steeringWheelMaxAngle) {
 		SteeringWheelMaxAngle = steeringWheelMaxAngle;
 	}
-	public double getBrakePedalAngle() {
-		return BreakPedalAngle;
+	public double getBrakePedalPercentage() {
+		return BreakPedalPercent;
 	}
 
-	public void setBrakePedalAngle(int breakPedalAngle) {
-		BreakPedalAngle = breakPedalAngle;
+	public void setBrakePedalPushPercent(double breakPedalAngle) {
+		BreakPedalPercent = breakPedalAngle;
 	}
 
-	public double getBrakePedalMaxAngle() {
-		return BreakPedalMaxAngle;
+	public double getGasPedalPercentage() {
+		return GasPedalPercent;
 	}
 
-	public void setBrakePedalMaxAngle(int breakPedalMaxAngle) {
-		BreakPedalMaxAngle = breakPedalMaxAngle;
-	}
-
-	public double getGasPedalAngle() {
-		return GasPedalAngle;
-	}
-
-	public void setGasPedalAngle(int gasPedalAngle) {
-		GasPedalAngle = gasPedalAngle;
-	}
-
-	public double getGasPedalMaxAngle() {
-		return GasPedalMaxAngle;
-	}
-
-	public void setGasPedalMaxAngle(int gasPedalMaxAngle) {
-		GasPedalMaxAngle = gasPedalMaxAngle;
+	public void setGasPedalPushPercent(double gasPedalAngle) {
+		GasPedalPercent = gasPedalAngle;
 	}
 
 	public int getCurrentGear() {
@@ -86,7 +77,7 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return GearTorque;
 	}
 
-	public void setGearTorque(int gearTorque) {
+	public void setGearTorque(double gearTorque) {
 		GearTorque = gearTorque;
 	}
 
@@ -110,7 +101,7 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return EngineTorque;
 	}
 
-	public void setEngineTorque(int engineTorque) {
+	public void setEngineTorque(double engineTorque) {
 		EngineTorque = engineTorque;
 	}
 
@@ -126,7 +117,7 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return WaterTemperature;
 	}
 
-	public void setWaterTemperature(int waterTemperature) {
+	public void setWaterTemperature(double waterTemperature) {
 		WaterTemperature = waterTemperature;
 	}
 
@@ -134,7 +125,7 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return OilTemperature;
 	}
 
-	public void setOilTemperature(int oilTemperature) {
+	public void setOilTemperature(double oilTemperature) {
 		OilTemperature = oilTemperature;
 	}
 
@@ -142,7 +133,7 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 		return OilPressure;
 	}
 
-	public void setOilPressure(int oilPressure) {
+	public void setOilPressure(double oilPressure) {
 		OilPressure = oilPressure;
 	}
 
@@ -301,13 +292,12 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 	/*DriverInput*/
 	private double SteeringWheelAngle;
 	private double SteeringWheelMaxAngle;
-	private double BreakPedalAngle;
-	private double BreakPedalMaxAngle;
-	private double GasPedalAngle;
-	private double GasPedalMaxAngle;
+	private double BreakPedalPercent;
+	private double GasPedalPercent;
 	private int CurrentGear;
 	private int MaxGear;
 	private int ShiftLeverPosition;
+	private boolean EngineToggleButtonState;
 	
 	/*Gearbox*/
 	private double GearTorque;
@@ -344,10 +334,14 @@ public class Container implements Engine_Out, DriverInput_Out, Gearbox_Out, Whee
 	private double TotalMassInKg;                        
 	private double InnerFrictionalCoefficientInNewton;   
 	
+	
+	
 	private static Container instance = null;
+	
 	
 	private Container(){
 		//do not instantiate; do not subclass;
 	}
+
 
 }

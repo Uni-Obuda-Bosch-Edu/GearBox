@@ -1,50 +1,56 @@
 package ImplBusInterface;
 
-import virtualDataBus.Container;
+//import virtualDataBus.Container;
+import TestTools.Container;
+
 import busInterface.Gearbox_Out;
 import busInterface.Public_In;
 
 public class GearBoxImpl implements Public_In, Gearbox_Out {
 
-	Container container;
+	Container bus;
 
 	private final double gearRatios[] = { -11.2961, 12.5848, 7.6574, 5.2469, 4.0080, 2.5109, 1.00 };
-
+	
+	static private class SpeedRanges{	// dimension in [m/s]
+		static public double speed_0_lo = 0.0;
+		static public double speed_0_up = 8.491666667;
+		static public double speed_1_up = 13.955555556;
+		static public double speed_2_up = 20.366666667;
+		static public double speed_3_up = 26.661111111;
+		static public double speed_4_up = 42.558333333;
+		
+	};
+	
 	private int gearStatus;
 
 	@Override
-	public void setGearTorque(int gearTorque) {
+	public void setGearTorque(double gearTorque) {
 		shiftDrive();
-		container.setWheelTorqueInNewton((double) calcOutputTorque(gearTorque));
+		bus.setWheelTorqueInNewton(calcOutputTorque(gearTorque));
 	}
 
 	@Override
 	public void setGearRevolution(int gearRevolution) {
 		shiftDrive();
-		// kerék fordulatszam ?!
-		// int gearRevoljution not used
-		// setWheelRevolution(calcOutputRevolution())
-		// setWheelTorque(calcOutputTorque())
-		// setWheelRevolution(calcOutputRevolution())
+		bus.setWheelRevoltuion(calcOutputRevolution(gearRevolution));
 	}
 
 	@Override
 	public void setGearMode(int gearMode) {
-		// 0° beonyomott pedal vagy a max angle ?!
-		if (container.getBrakePedalAngle() >= 0.0 && container.getBrakePedalAngle() <= 4.0) {
+		if (bus.getBrakePedalPercentage() >= 100.0 && bus.getBrakePedalPercentage() <= 96.0) {
 
-			if (isShiftLeverPositionD(container.getShiftLeverPosition())) {
+			if (isShiftLeverPositionD(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionD();
-			} else if (isShiftLeverPositionN(container.getShiftLeverPosition())) {
+			} else if (isShiftLeverPositionN(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionN();
-			} else if (isShiftLeverPositionP(container.getShiftLeverPosition())) {
+			} else if (isShiftLeverPositionP(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionP();
-			} else if (isShiftLeverPositionR(container.getShiftLeverPosition())) {
+			} else if (isShiftLeverPositionR(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionR();
 			}
 
 		}
-		// if(fek  pedal contaner.getpedal.. valami) akkor lehet ez
 	}
 
 	private boolean isShiftLeverPositionD(int ShiftLeverPosition) {
@@ -64,9 +70,8 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	}
 
 	private void ShiftLeverPositionD() {
-		setGearTorque((int) container.getGearTorque());// interfaceben double
-		// tipusra at kell irni
-		setGearRevolution(container.getGearRevolution());
+		setGearTorque( bus.getEngineTorque());
+		setGearRevolution(bus.getEngineRevolution());
 	}
 
 	private void ShiftLeverPositionN() {
@@ -81,147 +86,350 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	private void ShiftLeverPositionR() {
 		setGearTorque(-1);
+		setGearRevolution(-1);
 	}
 
 	private void shiftDrive() {
 
-		double inputSpeed = container.getCurrentGear();
-
-		if (inputSpeed >= 0 && inputSpeed < 30.57) {
+		double inputSpeed = bus.getCurrentGear();
+		System.out.format("%f\n", inputSpeed);
+		
+		if (inputSpeed >= SpeedRanges.speed_0_lo && inputSpeed < SpeedRanges.speed_0_up) {
 			gearStatus = 1;
-		} else if (inputSpeed >= 30.57 && inputSpeed < 50.24) {
+		} else if (inputSpeed >= SpeedRanges.speed_0_up && inputSpeed < SpeedRanges.speed_1_up) {
 			gearStatus = 2;
-		} else if (inputSpeed <= 50.24 && inputSpeed < 73.32) {
+		} else if (inputSpeed <= SpeedRanges.speed_1_up && inputSpeed < SpeedRanges.speed_2_up) {
 			gearStatus = 3;
-		} else if (inputSpeed >= 73.32 && inputSpeed < 95.98) {
+		} else if (inputSpeed >= SpeedRanges.speed_2_up && inputSpeed < SpeedRanges.speed_3_up) {
 			gearStatus = 4;
-		} else if (inputSpeed >= 95.98 && inputSpeed < 153.21) {
+		} else if (inputSpeed >= SpeedRanges.speed_3_up && inputSpeed < SpeedRanges.speed_4_up) {
 			gearStatus = 5;
-		} else if (inputSpeed >= 153.21) {
+		} else if (inputSpeed >= SpeedRanges.speed_4_up) {
 			gearStatus = 6;
 		} else if (inputSpeed < 0) {
 			gearStatus = 0;
 		}
 	}
 
-	private double calcOutputTorque(int gearTorque) {
+	private double calcOutputTorque(double gearTorque) {
 		return gearTorque * gearRatios[gearStatus];
 	}
 
-	private double calcOutputRevolution() {
-		// kerekatmorovel a kerke korrigalja
-		return ((container.getCurrentGear() / 3.6) * 60.0 * gearRatios[gearStatus]);
+	private double calcOutputRevolution(double Revolution) {
+		return (Revolution / gearRatios[gearStatus]);
 	}
 
 	public GearBoxImpl() {
-		container = Container.getInstance();
+		bus = Container.getInstance();
 		gearStatus = 0;
 
 	}
 
 	@Override
-	public double getSteeringWheelAngle() {
-		return container.getSteeringWheelAngle();
+	public double getSteeringWheelSignedPercentage() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public double getSteeringWheelMaxAngle() {
-		return container.getSteeringWheelMaxAngle();
+	public double getBrakePedalPercentage() {
+		return bus.getBrakePedalPercentage();
 	}
 
 	@Override
-	public double getBrakePedalAngle() {
-		return container.getBrakePedalAngle();
+	public double getGasPedalPercentage() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
-	public double getBrakePedalMaxAngle() {
-		return container.getBrakePedalMaxAngle();
-	}
-
-	@Override
-	public double getGasPedalAngle() {
-		return container.getGasPedalAngle();
-	}
-
-	@Override
-	public double getGasPedalMaxAngle() {
-		return container.getGasPedalMaxAngle();
+	public boolean getEngineToggleButtonState() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	@Override
 	public int getCurrentGear() {
-		return container.getCurrentGear();
+			return bus.getCurrentGear();
+
 	}
 
 	@Override
 	public int getMaxGear() {
-		return container.getMaxGear();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public int getShiftLeverPosition() {
-		return container.getShiftLeverPosition();
+		
+		return bus.getShiftLeverPosition();
 	}
 
 	@Override
 	public double getGearTorque() {
-		return container.getGearTorque();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public int getGearRevolution() {
-		return container.getGearRevolution();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public int getGearMode() {
-		return container.getGearMode();
+		return gearStatus;
 	}
 
 	@Override
 	public double getEngineTorque() {
-		return container.getEngineTorque();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public int getEngineRevolution() {
-		return container.getEngineRevolution();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getWaterTemperature() {
-		return container.getWaterTemperature();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getOilTemperature() {
-		return container.getOilTemperature();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getOilPressure() {
-		return container.getOilPressure();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public int getServiceCode() {
-		return container.getServiceCode();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getCenterOfXAxis() {
-		return container.getCenterOfXAxis();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getCenterOfYAxis() {
-		return container.getCenterOfYAxis();
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 	@Override
 	public double getMotionVectorXWithLengthAsSpeedInKm() {
-		return container.getMotionVectorXWithLengthAsSpeedInKm();
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMotionVectorYWithLengthAsSpeedInKm() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getWheelTorqueInNewton() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaximumTorqueInNewton() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaximumBrakeTorqueInNewton() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getFrictionalCoefficientOfBrakes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDiameterOfDriveAxesInMeters() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getLengthOfAxesInMeters() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDistanceBetweenAxesInMeters() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDiameterOfWheelsInMeters() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getWidthOfWheelsInMeters() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getDriveWheelStateZeroBasedDegree() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaximumDriveWheelStateZeroBasedDegree() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getMaximumWheelsTurnDegree() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getTotalMassInKg() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double getInnerFrictionalCoefficientInNewton() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/*@Override
+	public double getSteeringWheelAngle() {
+		return bus.getSteeringWheelAngle();
+	}
+
+	@Override
+	public double getSteeringWheelMaxAngle() {
+		return bus.getSteeringWheelMaxAngle();
+	}
+
+	@Override
+	public double getBrakePedalAngle() {
+		return bus.getBrakePedalAngle();
+	}
+
+	@Override
+	public double getBrakePedalMaxAngle() {
+		return bus.getBrakePedalMaxAngle();
+	}
+
+	@Override
+	public double getGasPedalAngle() {
+		return bus.getGasPedalAngle();
+	}
+
+	@Override
+	public double getGasPedalMaxAngle() {
+		return bus.getGasPedalMaxAngle();
+	}
+
+	@Override
+	public int getCurrentGear() {
+		return bus.getCurrentGear();
+	}
+
+	@Override
+	public int getMaxGear() {
+		return bus.getMaxGear();
+	}
+
+	@Override
+	public int getShiftLeverPosition() {
+		return bus.getShiftLeverPosition();
+	}
+
+	@Override
+	public double getGearTorque() {
+		return bus.getGearTorque();
+	}
+
+	@Override
+	public int getGearRevolution() {
+		return bus.getGearRevolution();
+	}
+
+	@Override
+	public int getGearMode() {
+		return bus.getGearMode();
+	}
+
+	@Override
+	public double getEngineTorque() {
+		return bus.getEngineTorque();
+	}
+
+	@Override
+	public int getEngineRevolution() {
+		return bus.getEngineRevolution();
+	}
+
+	@Override
+	public double getWaterTemperature() {
+		return bus.getWaterTemperature();
+	}
+
+	@Override
+	public double getOilTemperature() {
+		return bus.getOilTemperature();
+	}
+
+	@Override
+	public double getOilPressure() {
+		return bus.getOilPressure();
+	}
+
+	@Override
+	public int getServiceCode() {
+		return bus.getServiceCode();
+	}
+
+	@Override
+	public double getCenterOfXAxis() {
+		return bus.getCenterOfXAxis();
+	}
+
+	@Override
+	public double getCenterOfYAxis() {
+		return bus.getCenterOfYAxis();
+	}
+
+	@Override
+	public double getMotionVectorXWithLengthAsSpeedInKm() {
+		return bus.getMotionVectorXWithLengthAsSpeedInKm();
 	}
 
 	@Override
@@ -231,72 +439,72 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	@Override
 	public double getWheelTorqueInNewton() {
-		return container.getWheelTorqueInNewton();
+		return bus.getWheelTorqueInNewton();
 	}
 
 	@Override
 	public double getMaximumTorqueInNewton() {
-		return container.getMaximumBrakeTorqueInNewton();
+		return bus.getMaximumBrakeTorqueInNewton();
 	}
 
 	@Override
 	public double getFrictionalCoefficientOfBrakes() {
-		return container.getFrictionalCoefficientOfBrakes();
+		return bus.getFrictionalCoefficientOfBrakes();
 	}
 
 	@Override
 	public double getDiameterOfDriveAxesInMeters() {
-		return container.getDiameterOfDriveAxesInMeters();
+		return bus.getDiameterOfDriveAxesInMeters();
 	}
 
 	@Override
 	public double getLengthOfAxesInMeters() {
-		return container.getLengthOfAxesInMeters();
+		return bus.getLengthOfAxesInMeters();
 	}
 
 	@Override
 	public double getDistanceBetweenAxesInMeters() {
-		return container.getDistanceBetweenAxesInMeters();
+		return bus.getDistanceBetweenAxesInMeters();
 	}
 
 	@Override
 	public double getDiameterOfWheelsInMeters() {
-		return container.getDiameterOfWheelsInMeters();
+		return bus.getDiameterOfWheelsInMeters();
 	}
 
 	@Override
 	public double getWidthOfWheelsInMeters() {
-		return container.getWidthOfWheelsInMeters();
+		return bus.getWidthOfWheelsInMeters();
 	}
 
 	@Override
 	public double getDriveWheelStateZeroBasedDegree() {
-		return container.getDriveWheelStateZeroBasedDegree();
+		return bus.getDriveWheelStateZeroBasedDegree();
 	}
 
 	@Override
 	public double getMaximumDriveWheelStateZeroBasedDegree() {
-		return container.getMaximumDriveWheelStateZeroBasedDegree();
+		return bus.getMaximumDriveWheelStateZeroBasedDegree();
 	}
 
 	@Override
 	public double getMaximumWheelsTurnDegree() {
-		return container.getMaximumWheelsTurnDegree();
+		return bus.getMaximumWheelsTurnDegree();
 	}
 
 	@Override
 	public double getTotalMassInKg() {
-		return container.getTotalMassInKg();
+		return bus.getTotalMassInKg();
 	}
 
 	@Override
 	public double getInnerFrictionalCoefficientInNewton() {
-		return container.getInnerFrictionalCoefficientInNewton();
+		return bus.getInnerFrictionalCoefficientInNewton();
 	}
 
 	@Override
 	public double getMaximumBrakeTorqueInNewton() {
-		return container.getMaximumBrakeTorqueInNewton();
-	}
+		return bus.getMaximumBrakeTorqueInNewton();
+	}*/
 
 }
