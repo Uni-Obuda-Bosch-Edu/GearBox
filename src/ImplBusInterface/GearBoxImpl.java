@@ -23,6 +23,8 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	};
 	
 	private int gearStatus;
+	private double torque;
+	private double revolution;
 
 	@Override
 	public void setGearTorque(double gearTorque) {
@@ -38,8 +40,11 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	@Override
 	public void setGearMode(int gearMode) {
-		if (bus.getBrakePedalPercentage() >= 100.0 && bus.getBrakePedalPercentage() <= 96.0) {
-
+		System.out.println("gearmode");
+		double tmp = bus.getBrakePedalPercentage();
+		System.out.format("%f\n",tmp );
+		if (tmp <= 100.0 && tmp >= 96.0) {
+			System.out.println("in");
 			if (isShiftLeverPositionD(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionD();
 			} else if (isShiftLeverPositionN(bus.getShiftLeverPosition())) {
@@ -98,7 +103,7 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 			gearStatus = 1;
 		} else if (inputSpeed >= SpeedRanges.speed_0_up && inputSpeed < SpeedRanges.speed_1_up) {
 			gearStatus = 2;
-		} else if (inputSpeed <= SpeedRanges.speed_1_up && inputSpeed < SpeedRanges.speed_2_up) {
+		} else if (inputSpeed >= SpeedRanges.speed_1_up && inputSpeed < SpeedRanges.speed_2_up) {
 			gearStatus = 3;
 		} else if (inputSpeed >= SpeedRanges.speed_2_up && inputSpeed < SpeedRanges.speed_3_up) {
 			gearStatus = 4;
@@ -112,11 +117,13 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	}
 
 	private double calcOutputTorque(double gearTorque) {
-		return gearTorque * gearRatios[gearStatus];
+		torque = gearTorque * gearRatios[gearStatus];
+		return torque;
 	}
 
 	private double calcOutputRevolution(double Revolution) {
-		return (Revolution / gearRatios[gearStatus]);
+		revolution = (Revolution / gearRatios[gearStatus]);
+		return revolution;
 	}
 
 	public GearBoxImpl() {
@@ -168,14 +175,12 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 
 	@Override
 	public double getGearTorque() {
-		// TODO Auto-generated method stub
-		return 0;
+		return torque;
 	}
 
 	@Override
 	public int getGearRevolution() {
-		// TODO Auto-generated method stub
-		return 0;
+		return (int)revolution;
 	}
 
 	@Override
