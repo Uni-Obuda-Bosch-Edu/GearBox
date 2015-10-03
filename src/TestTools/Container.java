@@ -4,10 +4,10 @@ package TestTools;
 // Dummy container
 
 
-public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, Wheels_Out, Public_In{
+public class Container {
 
-	private double BreakPedalState;
-	private int ShiftLeverPosition;
+	private double BreakPedalState = 0.0;
+	private int ShiftLeverPosition = 0;
 	private double EngineTorque = 0.0;
 	private double EngineRevolution = 0.0;
 	private double GearTorque = 0.0;
@@ -23,24 +23,14 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 			instance = new Container();
 		return instance;
 	}
-	
-	
-	public int getMaxGear() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
 
 	public int getShiftLeverPosition() {
 		return ShiftLeverPosition;
 	}
 
-
 	public double getGearTorque() {
 		return GearTorque;
 	}
-
 
 	public int getGearRevolution() {
 		return (int)GearRevolution;
@@ -49,7 +39,6 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 	public int getGearMode() {
 		return ShiftLeverPosition;
 	}
-
 
 	public double getEngineTorque() {
 	
@@ -60,137 +49,11 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 		
 		return (int)EngineRevolution;
 	}
-
-
-	public double getWaterTemperature() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	
-	public double getOilTemperature() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getOilPressure() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public int getServiceCode() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getCenterOfXAxis() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public double getCenterOfYAxis() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
-	public double getMotionVectorXWithLengthAsSpeedInKm() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public double getMotionVectorYWithLengthAsSpeedInKm() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
 	public double getWheelTorqueInNewton() {
 		return WheelTorque;
 	}
 
-
-	public double getMaximumTorqueInNewton() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getMaximumBrakeTorqueInNewton() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getFrictionalCoefficientOfBrakes() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getDiameterOfDriveAxesInMeters() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getLengthOfAxesInMeters() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getDistanceBetweenAxesInMeters() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getDiameterOfWheelsInMeters() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getWidthOfWheelsInMeters() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
-	public double getDriveWheelStateZeroBasedDegree() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getMaximumDriveWheelStateZeroBasedDegree() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getMaximumWheelsTurnDegree() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public double getTotalMassInKg() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
-	public double getInnerFrictionalCoefficientInNewton() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	
 	public void setGearTorque(double gearTorque) {
 		GearTorque = gearTorque;
 	}
@@ -200,52 +63,17 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 		
 	}
 
-
 	public void setGearMode(int gearMode) {
-		this.gearMode = gearMode;
+		gearMode = gearMode;
 	}
 
-
-	public void setEngineToggleButtonState(boolean buttonState) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void setWheelRotationPercent(double steeringWheelAngle) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-	public void setSteeringWheelMaxAngle(double steeringWheelMaxAngle) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
 	public void setBrakePedalPushPercent(double breakPedalState) {
-		
-		this.BreakPedalState = breakPedalState;	
-		System.out.format("%f\n", breakPedalState);
-		System.out.format("%f\n",this.BreakPedalState);
-	}
-
-
-	public void setGasPedalPushPercent(double gasPedalPercent) {
-		// TODO Auto-generated method stub
-		
+		BreakPedalState = breakPedalState;	
 	}
 
 
 	public void setCurrentGear(int currentGear) {
 		Speed = currentGear;
-		
-	}
-
-
-	public void setMaxGear(int maxGear) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -256,17 +84,13 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 	}
 
 	public void setEngineTorque(double engineTorque) {
-		System.out.println("bus");
 		EngineTorque = engineTorque;
-		
 	}
 
 	public void setEngineRevolution(int engineRevolution) {
 		EngineRevolution = engineRevolution;
 		
 	}
-
-
 
 	public int getCurrentGear() {
 		return Speed;
@@ -280,15 +104,12 @@ public class Container {//implements Engine_Out, DriverInput_Out, Gearbox_Out, W
 
 
 	public double getBrakePedalPercentage() {
-		System.out.println("breakget");
-		System.out.format("%f\n",BreakPedalState);
 		return BreakPedalState;
 	}
 
 
 	public void setWheelTorqueInNewton(double calcOutputTorque) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 }

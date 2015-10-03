@@ -19,8 +19,15 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 		static public double speed_2_up = 20.366666667;
 		static public double speed_3_up = 26.661111111;
 		static public double speed_4_up = 42.558333333;
-		
 	};
+	
+	private double BreakLimit_lo = 96.0;
+	private double BreakLimit_hi = 100.0;
+	
+	private int DRIVE = 7;
+	private int REVERSE = 10;
+	private int NEUTRAL = 8;
+	private int PARKING = 9;
 	
 	private int gearStatus;
 	private double torque;
@@ -38,13 +45,17 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 		bus.setWheelRevoltuion(calcOutputRevolution(gearRevolution));
 	}
 
-	@Override
-	public void setGearMode(int gearMode) {
-		System.out.println("gearmode");
-		double tmp = bus.getBrakePedalPercentage();
-		System.out.format("%f\n",tmp );
-		if (tmp <= 100.0 && tmp >= 96.0) {
-			System.out.println("in");
+	private boolean breakPedalCheck(){
+		double breakPedalPercentage = bus.getBrakePedalPercentage();
+		if (breakPedalPercentage <= BreakLimit_hi && breakPedalPercentage >= BreakLimit_lo) {
+			return true;
+		}
+			return false;
+	}
+
+	public void setGearMode(int gearMode) {	// nem varunk input parametert
+		
+		if (breakPedalCheck()) {
 			if (isShiftLeverPositionD(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionD();
 			} else if (isShiftLeverPositionN(bus.getShiftLeverPosition())) {
@@ -54,24 +65,23 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 			} else if (isShiftLeverPositionR(bus.getShiftLeverPosition())) {
 				ShiftLeverPositionR();
 			}
-
 		}
 	}
 
 	private boolean isShiftLeverPositionD(int ShiftLeverPosition) {
-		return ShiftLeverPosition == 7;
+		return ShiftLeverPosition == DRIVE;
 	}
 
 	private boolean isShiftLeverPositionN(int ShiftLeverPosition) {
-		return ShiftLeverPosition == 8;
+		return ShiftLeverPosition == NEUTRAL;
 	}
 
 	private boolean isShiftLeverPositionP(int ShiftLeverPosition) {
-		return ShiftLeverPosition == 9;
+		return ShiftLeverPosition == PARKING;
 	}
 
 	private boolean isShiftLeverPositionR(int ShiftLeverPosition) {
-		return ShiftLeverPosition == 10;
+		return ShiftLeverPosition == REVERSE;
 	}
 
 	private void ShiftLeverPositionD() {
@@ -90,14 +100,12 @@ public class GearBoxImpl implements Public_In, Gearbox_Out {
 	}
 
 	private void ShiftLeverPositionR() {
-		setGearTorque(-1);
-		setGearRevolution(-1);
+		setGearTorque( bus.getEngineTorque());
+		setGearRevolution(bus.getEngineRevolution());
 	}
 
 	private void shiftDrive() {
-
 		double inputSpeed = bus.getCurrentGear();
-		System.out.format("%f\n", inputSpeed);
 		
 		if (inputSpeed >= SpeedRanges.speed_0_lo && inputSpeed < SpeedRanges.speed_0_up) {
 			gearStatus = 1;

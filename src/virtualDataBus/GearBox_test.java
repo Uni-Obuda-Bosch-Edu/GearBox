@@ -4,156 +4,153 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import ImplBusInterface.GearBoxImpl;
+
+
 import TestTools.Container;
 
 public class GearBox_test {
 
 	private Container bus = Container.getInstance();
 	private GearBoxImpl gearBox = new GearBoxImpl();
+	private int DRIVE = 7;
+	private int REVERSE = 10;
+	private double pushBreakPedal = 100.0;
+	
+	private double def_torque = 100;	// [Nm]
+	private int def_revolution = (int)(3000/60); // [1/s]
+	private double def_gear_ratio =  5.2469;
+	private double def_gear_ratio_rev = -11.2961;
+	private int speed = 0;	//[m/s]
 	
 	@Test
 	public void testSetGearTorque() {
-		bus.setEngineTorque(100);
-		bus.setEngineRevolution(3000);
+		bus.setEngineTorque(def_torque);
+		bus.setEngineRevolution(def_revolution);
 		
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		bus.setShiftLeverPosition(7);	// Drive
-		bus.setCurrentGear(20);	// input speed
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(DRIVE);
+		speed = 20;
+		bus.setCurrentGear(speed);	
 		gearBox.setGearMode(0);	// felesleges input
 		
 		double torque = gearBox.getGearTorque();
-		System.out.format("torque %f\n",torque);
-	
-		double torq_calc = 100 * 5.2469;
+		double torq_calc = def_torque * def_gear_ratio;
 		assertEquals((int)torque,(int)torq_calc);
 
 	}
 	@Test
 	public void testSetGearTorque_reverse() {
-		bus.setEngineTorque(100);
-		bus.setEngineRevolution(3000);
+		bus.setEngineTorque(def_torque);
+		bus.setEngineRevolution(def_revolution);
 		
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		bus.setShiftLeverPosition(10);	// Reverse
-		bus.setCurrentGear(-20);	// input speed
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(REVERSE);	
+		speed = -20;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
 		
 		double torque = gearBox.getGearTorque();
-		System.out.format("torque_rev %f\n",torque);
-	
-		double torq_calc = (100 * 5.2469) * (-1.0);
+		double torq_calc = (def_torque * (def_gear_ratio_rev));
 		assertEquals((int)torque,(int)torq_calc);
-
 	}
 
 	@Test
 	public void testSetGearRevolution() {
-		bus.setEngineTorque(100);
-		bus.setEngineRevolution(3000);
+		bus.setEngineTorque(def_torque);
+		bus.setEngineRevolution(def_revolution);
 		
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		bus.setShiftLeverPosition(7);	// Drive
-		bus.setCurrentGear(20);	// input speed
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(DRIVE);
+		speed = 20;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
 		
 		double revolution = gearBox.getGearRevolution();
-		System.out.format("revolution %f\n",revolution);
-		
-		double rev_calc = 3000/ 5.2469;
-		assertEquals((int)revolution,(int)rev_calc);
-	}
-	@Test
-	public void testSetGearREvolution_reverse() {
-		bus.setEngineTorque(100);
-		bus.setEngineRevolution(3000);
-		
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		bus.setShiftLeverPosition(10);	// Reverse
-		bus.setCurrentGear(-20);	// input speed
-		gearBox.setGearMode(0);	// felesleges input
-		
-		double revolution = gearBox.getGearRevolution();
-		System.out.format("revolution_rev %f\n",revolution);
-	
-		double rev_calc = (100 * 5.2469) * (-1.0);
-		assertEquals((int)revolution,(int)rev_calc);
-
-	}
-
-	@Test
-	public void testGetShiftLeverPosition() {
 				
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-	
-		bus.setShiftLeverPosition(7);	// Drive
-
-		bus.setCurrentGear(2);	// input speed
+		double rev_calc = def_revolution/ def_gear_ratio;
+		assertEquals((int)revolution,(int)rev_calc);
+	}
+	@Test
+	public void testSetGearRevolution_reverse() {
+		bus.setEngineTorque(def_torque);
+		bus.setEngineRevolution(def_revolution);
+		
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(REVERSE);
+		speed = -20;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
+		
+		double revolution = gearBox.getGearRevolution();
 	
+		double rev_calc = (def_revolution / (def_gear_ratio_rev));
+		assertEquals((int)revolution,(int)rev_calc);
+
+	}
+
+	@Test
+	public void testGetShiftLeverPosition() {	// fokozatok vegigvaltasa
+				
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(DRIVE);
+	
+		speed = 2;
+		bus.setCurrentGear(speed);
+		gearBox.setGearMode(0);	// felesleges input
 		int mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(1,mode);
 		
-		bus.setCurrentGear(10);	// input speed
+		speed = 10;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(2,mode);
 		
-		bus.setCurrentGear(15);	// input speed
+		speed = 15;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(3,mode);
 		
-		bus.setCurrentGear(25);	// input speed
+		speed = 25;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(4,mode);
 		
-		bus.setCurrentGear(30);	// input speed
+		speed = 30;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(5,mode);
 		
-		bus.setCurrentGear(50);	// input speed
+		speed = 50;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(6,mode);
 		
-		
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		
-		bus.setShiftLeverPosition(10);	// Reverse
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(REVERSE);
 
-		bus.setCurrentGear(-20);	// input speed
+		speed = -20;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
-	
 		mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(0,mode);
 	}
 
 	
 	@Test
 	public void testGetGearMode() {
-		bus.setBrakePedalPushPercent(100); // break pedal teljesen benyomva
-		
-		bus.setShiftLeverPosition(7);	// Drive
+		bus.setBrakePedalPushPercent(pushBreakPedal);
+		bus.setShiftLeverPosition(DRIVE);
 
-		bus.setCurrentGear(2);	// input speed
+		speed = 2;
+		bus.setCurrentGear(speed);
 		gearBox.setGearMode(0);	// felesleges input
 	
 		int mode = gearBox.getGearMode();
-		System.out.format("mode %d\n",mode);
 		assertEquals(1,mode);
 	}
 
